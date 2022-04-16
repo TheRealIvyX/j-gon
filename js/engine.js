@@ -109,26 +109,44 @@ function collisionChecks(event) {
                         let dmg = Math.min(Math.max(0.025 * Math.sqrt(mob[k].mass), 0.05), 0.3) * simulation.dmgScale; //player damage is capped at 0.3*dmgScale of 1.0
                         if (m.isCloak) dmg *= 0.5
                         mob[k].foundPlayer();
-                        if (tech.isRewindAvoidDeath && m.energy > 0.66) { //CPT reversal runs in m.damage, but it stops the rest of the collision code here too
+                        if (tech.isRewindAvoidDeath && m.energy > 0.66 && !tech.isEnemyStomp) { //CPT reversal runs in m.damage, but it stops the rest of the collision code here too. collision code is stopped later if you have the stomp tech so that it works with cpt
                             m.damage(dmg);
                             return
                         }
+			let hasStomped = false
+ 			function toolazytocopyandpaste() {
+			  if (!tech.isEnemyStomp) m.damage(dmg); else {
+			    let angle = Math.atan2(player.position.y - mob[k].position.y, player.position.x - mob[k].position.x)*180/Math.PI;
+			    // console.log(angle)
+			    if (angle > -135 && angle < -45) {
+			      if (m.Vy-mob[k].velocity.y > 0) {
+			        mob[k].damage(Math.max(0, Math.log(m.Vy-mob[k].velocity.y)))
+                                Matter.Body.setVelocity(player, {
+                                  x: player.velocity.x,
+                                  y: -14 - input.up*2
+                                });
+			        hasStomped = true
+			      } else m.damage(dmg)
+			    } else m.damage(dmg)
+			  }
+			}
                         if (tech.isFlipFlop) {
                             if (tech.isFlipFlopOn) {
                                 tech.isFlipFlopOn = false
                                 if (document.getElementById("tech-flip-flop")) document.getElementById("tech-flip-flop").innerHTML = ` = <strong>OFF</strong>`
                                 m.eyeFillColor = 'transparent'
-                                m.damage(dmg);
+                                toolazytocopyandpaste();
                             } else {
                                 tech.isFlipFlopOn = true //immune to damage this hit, lose immunity for next hit
                                 if (document.getElementById("tech-flip-flop")) document.getElementById("tech-flip-flop").innerHTML = ` = <strong>ON</strong>`
                                 m.eyeFillColor = m.fieldMeterColor //'#0cf'
-                                if (!tech.isFlipFlopHarm) m.damage(dmg);
+                                if (!tech.isFlipFlopHarm) toolazytocopyandpaste();
                             }
                             if (tech.isFlipFlopHealth) m.setMaxHealth();
                         } else {
-                            m.damage(dmg); //normal damage
+                            toolazytocopyandpaste(); //normal damage
                         }
+			if (tech.isRewindAvoidDeath && m.energy > 0.66 && tech.isEnemyStomp && hasStomped == false) return 0 // stops the code after the stomp tech stuff is done if you have cpt so that cpt works with stomp
 
                         if (tech.isCollisionRealitySwitch) {
                             m.switchWorlds()
@@ -141,10 +159,12 @@ function collisionChecks(event) {
                         if (m.immuneCycle < m.cycle + tech.collisionImmuneCycles) m.immuneCycle = m.cycle + tech.collisionImmuneCycles; //player is immune to damage for 30 cycles
                         //extra kick between player and mob              //this section would be better with forces but they don't work...
                         let angle = Math.atan2(player.position.y - mob[k].position.y, player.position.x - mob[k].position.x);
-                        Matter.Body.setVelocity(player, {
-                            x: player.velocity.x + 8 * Math.cos(angle),
-                            y: player.velocity.y + 8 * Math.sin(angle)
-                        });
+			if (hasStomped === false) {
+                          Matter.Body.setVelocity(player, {
+                              x: player.velocity.x + 8 * Math.cos(angle),
+                              y: player.velocity.y + 8 * Math.sin(angle)
+                          });
+			}
                         Matter.Body.setVelocity(mob[k], {
                             x: mob[k].velocity.x - 8 * Math.cos(angle),
                             y: mob[k].velocity.y - 8 * Math.sin(angle)

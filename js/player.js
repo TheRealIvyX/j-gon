@@ -645,7 +645,7 @@ const m = {
         }
     },
     damage(dmg) {
-        if (tech.isRewindAvoidDeath && m.energy > 0.6) {
+        if (tech.isRewindAvoidDeath && m.energy > 0.66) {
             const steps = Math.floor(Math.min(299, 150 * m.energy))
             simulation.makeTextLog(`<span class='color-var'>m</span>.rewind(${steps})`)
             m.rewind(steps)
@@ -3949,8 +3949,9 @@ const m = {
                                 break;
                             }
 
-                            function collideMob(obj) {
+                            function collideMob(obj) { // note: this function is never called. apparently.
                                 //player + mob collision
+				console.log('bro do you even work')
                                 if (
                                     m.immuneCycle < m.cycle &&
                                     // (obj === playerBody || obj === playerHead) &&
@@ -3963,7 +3964,7 @@ const m = {
                                         m.damage(dmg);
                                         return
                                     }
-                                    m.damage(dmg);
+                                    m.damage(dmg)
                                     if (tech.isPiezo) m.energy += 20.48;
                                     if (tech.isStimulatedEmission) powerUps.ejectTech()
                                     if (mob[k].onHit) mob[k].onHit();

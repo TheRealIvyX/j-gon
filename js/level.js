@@ -2650,7 +2650,7 @@ const level = {
         //     doorIn.isClosing = !(mob.length > 0)
         //     doorIn.openClose();
 
-        const doorIn = level.door(187, -950, 25, 200, 190, 2) //x, y, width, height, distance, speed = 1
+        const doorIn = level.door(187, -950, 25, 200, 190, 10) //x, y, width, height, distance, speed = 1
         const doorOut = level.door(2762, -175, 25, 200, 190, 2) //x, y, width, height, distance, speed = 1
         doorOut.isClosing = true
         let isDoorsLocked = false
@@ -2658,7 +2658,7 @@ const level = {
         let isSpawnedBoss = false
 
         level.custom = () => {
-            // player.force.y -= player.mass * simulation.g * 0.4; //float player
+            player.force.y -= player.mass * simulation.g * 0.4; //float player
 
             if (isDoorsLocked) {
                 if (!isFightOver && !(simulation.cycle % 120)) { //once a second
@@ -2688,9 +2688,9 @@ const level = {
                 //     doorOut.isClosing = false
                 //     powerUps.spawnBossPowerUp(2900, -200)
                 // }
-                if (player.position.x < 0) { //if player gets trapped inside starting room open up again
-                    isDoorsLocked = false
-                    doorIn.isClosing = false
+                if (player.position.x < 220 && !isFightOver) { //if player tries to cheese using CPT send them back out
+                    m.pos.x = 245
+                    player.position.x = 245
                 }
             } else if (player.position.x > 225) {
                 isDoorsLocked = true

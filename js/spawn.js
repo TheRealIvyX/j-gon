@@ -4,7 +4,7 @@ const spawn = {
     // other bosses: suckerBoss, laserBoss, tetherBoss, mantisBoss, bounceBoss, sprayBoss    //these need a particular level to work so they are not included in the random pool
     randomBossList: ["shieldingBoss", "orbitalBoss", "historyBoss", "shooterBoss", "cellBossCulture", "bomberBoss", "spiderBoss", "launcherBoss", "laserTargetingBoss",
         "powerUpBoss", "powerUpBossBaby", "snakeBoss", "streamBoss", "pulsarBoss", "spawnerBossCulture", "grenadierBoss", "growBossCulture", "blinkBoss",
-        "snakeSpitBoss", "laserBombingBoss", "blockBoss", "revolutionBoss", "slashBoss"
+        "snakeSpitBoss", "laserBombingBoss", "blockBoss", "revolutionBoss", "slashBoss", "healBoss"
     ],
     bossTypeSpawnOrder: [], //preset list of boss names calculated at the start of a run by the randomSeed
     bossTypeSpawnIndex: 0, //increases as the boss type cycles
@@ -5691,6 +5691,31 @@ const spawn = {
             this.seePlayerCheckByDistance();
             this.checkStatus();
             this.attraction();
+        };
+    },
+
+    healBoss(x, y, radius = 90) {
+        mobs.spawn(x, y, 9, radius, "#caa008");
+        let me = mob[mob.length - 1];
+	me.isBoss = true;
+        me.accelMag = 0.0002
+	me.damageReduction = 0.333 / (tech.isScaleMobsWithDuplication ? 1 + tech.duplicationChance() : 1)
+        me.memory = 120;
+        me.seeAtDistance2 = 2000000 //1400 vision range
+        me.laserRange = 370;
+        Matter.Body.setDensity(me, 0.0017 + 0.0002 * Math.sqrt(simulation.difficulty))
+        me.onDeath = function() {
+            powerUps.spawnBossPowerUp(this.position.x, this.position.y)
+        };
+        me.do = function() {
+            this.seePlayerByLookingAt();
+            this.attraction();
+            this.checkStatus();
+            this.harmZone();
+	    for (let jej of mob) {
+	      jej.health += 0.0175 * (jej.isBoss ? 0.333 : 1)
+	      if (jej.health > 1) jej.health = 1
+	    }
         };
     },
     //complex constrained mob templates**********************************************************************

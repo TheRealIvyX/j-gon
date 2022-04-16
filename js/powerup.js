@@ -928,7 +928,7 @@ const powerUps = {
 	    if (tech.isTreasure && Math.random() < tech.duplicationChance()) powerUps.spawn(x, y, "tech");
             return;
         }
-        if (Math.random() < 0.01*(1+Math.log(tech.isLooting+1)) && tech.isLooting) {
+        if (Math.random() < 0.03*(1+Math.log(tech.isLooting+1)) && tech.isLooting) {
            powerUps.spawn(x, y, "research");
 	    if (tech.isTreasure && Math.random() < tech.duplicationChance()) powerUps.spawn(x, y, "research");
            return;

@@ -1530,6 +1530,24 @@ const tech = {
             }
         },
         {
+            name: "stomp",
+            description: `<strong>jumping</strong> on a mob <strong class='color-d'>damages</strong> it<br>jumping on mobs no longer does <strong class='color-harm'>harm</strong>`,
+            maxCount: 1,
+            count: 0,
+            frequency: 1,
+            frequencyDefault: 1,
+            allowed() {
+                return !tech.isAnnihilation
+            },
+            requires: "not annihilation",
+            effect: () => {
+                tech.isEnemyStomp = 1
+            },
+            remove() {
+                tech.isEnemyStomp = 0
+            }
+        },
+        {
             name: "mass driver",
             description: "increase <strong class='color-block'>block</strong> collision <strong class='color-d'>damage</strong> by <strong>300%</strong>",
             maxCount: 1,
@@ -2443,7 +2461,7 @@ const tech = {
         },
         {
             name: "furnace",
-            description: `passive <strong class='color-f'>energy</strong> regeneration is increased by <strong>400%</strong> but your <strong class='color-r'>research</strong> is slowly consumed over time and lack of <strong class='color-r'>research</strong> causes <strong class='color-harm'>harm</strong><br> spawn ${powerUps.orb.research(6)}`,
+            description: `passive <strong class='color-f'>energy</strong> regeneration is increased by <strong>400%</strong><br>slowly <strong>drains</strong> <strong class='color-r'>research</strong> or <strong class='color-h'>health</strong><br> spawn ${powerUps.orb.research(6)}`,
             maxCount: 1,
             count: 0,
             frequency: 1,
@@ -3671,8 +3689,8 @@ const tech = {
         },
         {
             name: "looting",
-            description: `mobs drop slightly more power ups on death and can drop <strong class='color-r'>research</strong>`,
-            maxCount: 9,
+            description: `mobs drop slightly more power ups on death<br>mobs can drop <strong class='color-r'>research</strong>`,
+            maxCount: 3,
             count: 0,
             frequency: 2,
             frequencyDefault: 2,
@@ -3689,7 +3707,7 @@ const tech = {
         },
         {
             name: "treasure",
-            description: `mobs can drop <strong class='color-dup'>duplicate</strong> power ups based on your <strong class='color-dup'>duplication</strong> chance, but the <strong>health</strong> of all mobs is increased by your <strong class='color-dup'>duplication</strong> chance multiplied by 2.3<br> adds <strong>35%</strong> <strong class='color-dup'>duplication</strong> chance<br><strong>+50%</strong> <strong class='color-j'>JUNK</strong> to the potential <strong class='color-m'>tech</strong> pool`,
+            description: `mobs can drop <strong class='color-dup'>duplicate</strong> power ups based on your <strong class='color-dup'>duplication</strong> chance<br>mobs spawn with more <strong>health</strong> based on your <strong class='color-dup'>duplication</strong> chance<br>adds <strong>35%</strong> <strong class='color-dup'>duplication</strong> chance<br><strong>+35%</strong> <strong class='color-j'>JUNK</strong> to the potential <strong class='color-m'>tech</strong> pool`,
             maxCount: 1,
             count: 0,
             frequency: 1,
@@ -3701,12 +3719,12 @@ const tech = {
             effect: () => {
                 tech.isTreasure = 1
 		powerUps.setDupChance();
-		tech.addJunkTechToPool(0.5)
+		tech.addJunkTechToPool(0.35)
             },
             remove() {
                 tech.isTreasure = 0
 		powerUps.setDupChance();
-		tech.removeJunkTechFromPool(0.5)
+		tech.removeJunkTechFromPool(0.35)
             }
         },
         // {
@@ -6466,9 +6484,9 @@ const tech = {
             frequency: 2,
             frequencyDefault: 2,
             allowed() {
-                return m.fieldUpgrades[m.fieldMode].name === "negative mass"
+                return m.fieldUpgrades[m.fieldMode].name === "negative mass" && !tech.isEnemyStomp
             },
-            requires: "negative mass",
+            requires: "negative mass, not stomp",
             effect() {
                 tech.isAnnihilation = true
             },
@@ -9578,6 +9596,7 @@ const tech = {
     energySiphon: null,
     healthDrain: null,
     isLooting: null,
+    isEnemyStomp: null,
     crouchAmmoCount: null,
     isBulletsLastLonger: null,
     isImmortal: null,
