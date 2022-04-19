@@ -107,7 +107,7 @@ const spawn = {
             }
         }
     },
-    secondaryBossChance(x, y) {
+    secondaryBossChance(x, y, options = []) {
         if (tech.isDuplicateBoss && Math.random() < 2 * tech.duplicationChance()) {
             tech.isScaleMobsWithDuplication = true
             spawn.randomLevelBoss(x, y);
@@ -120,7 +120,7 @@ const spawn = {
             } else {
                 tech.addJunkTechToPool(0.49)
             }
-            spawn.randomLevelBoss(x, y);
+            spawn.randomLevelBoss(x, y, options);
             return true
         }
         return false
