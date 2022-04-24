@@ -868,6 +868,30 @@ const powerUps = {
             }
         }
     },
+    exoticPartsMaxHP: {
+        count: 0,
+        name: "max health",
+        color: "#4b6",
+        size() {
+            return 20;
+        },
+        effect() {
+            tech.extraMaxHealth += 0.08
+            m.setMaxHealth();
+        },
+    },
+    exoticPartsMaxE: {
+        count: 0,
+        name: "max energy",
+        color: "#0ae",
+        size() {
+            return 20;
+        },
+        effect() {
+            tech.healMaxEnergyBonus += 0.08
+            m.setMaxEnergy();
+        },
+    },
     onPickUp(who) {
         powerUps.research.currentRerollCount = 0
         if (tech.isTechDamage && who.name === "tech") m.damage(0.11)
@@ -902,35 +926,43 @@ const powerUps = {
     //     }
     // },
     spawnRandomPowerUp(x, y) { //mostly used after mob dies,  doesn't always return a power up
-        if ((Math.random() * Math.random() - 0.3 > Math.sqrt(m.health) && !tech.isEnergyHealth) || Math.random() < 0.04*(1+Math.log(tech.isLooting+1))) { //spawn heal chance is higher at low health
+        if ((Math.random() * Math.random() - 0.3 > Math.sqrt(m.health) && !tech.isEnergyHealth) || Math.random() < 0.04*(1+Math.log(tech.isLooting+1))*(tech.isExoticParts ? 0.7 : 1)) { //spawn heal chance is higher at low health
             powerUps.spawn(x, y, "heal");
 	    if (tech.isTreasure && Math.random() < tech.duplicationChance()) powerUps.spawn(x, y, "heal");
             return;
         }
-        if (Math.random() < 0.15*(1+Math.log(tech.isLooting+1)) && b.inventory.length > 0) {
+        if (Math.random() < 0.15*(1+Math.log(tech.isLooting+1)*(tech.isExoticParts ? 0.7 : 1)) && b.inventory.length > 0) {
             powerUps.spawn(x, y, "ammo");
 	    if (tech.isTreasure && Math.random() < tech.duplicationChance()) powerUps.spawn(x, y, "ammo");
             return;
         }
-        if (Math.random() < 0.0007*(1+Math.log(tech.isLooting+1)) * (3 - b.inventory.length)) { //a new gun has a low chance for each not acquired gun up to 3
+        if (Math.random() < 0.0007*(1+Math.log(tech.isLooting+1)*(tech.isExoticParts ? 0.7 : 1)) * (3 - b.inventory.length)) { //a new gun has a low chance for each not acquired gun up to 3
             powerUps.spawn(x, y, "gun");
 	    if (tech.isTreasure && Math.random() < tech.duplicationChance()) powerUps.spawn(x, y, "gun");
             return;
         }
         // if (Math.random() < 0.0027 * (22 - tech.totalCount)) { //a new tech has a low chance for each not acquired tech up to 25
-        if (Math.random() < 0.005*(1+Math.log(tech.isLooting+1)) * (tech.isLooting ? 10-level.levelsCleared : Math.max(1, 10-level.levelsCleared))) { //a new tech has a low chance that decreases in later levels
+        if (Math.random() < 0.005*(1+Math.log(tech.isLooting+1)*(tech.isExoticParts ? 0.7 : 1)) * (tech.isLooting ? 10-level.levelsCleared : Math.max(1, 10-level.levelsCleared))) { //a new tech has a low chance that decreases in later levels
             powerUps.spawn(x, y, "tech");
 	    if (tech.isTreasure && Math.random() < tech.duplicationChance()) powerUps.spawn(x, y, "tech");
             return;
         }
-        if (Math.random() < 0.0015*(1+Math.log(tech.isLooting+1))) {
+        if (Math.random() < 0.0015*(1+Math.log(tech.isLooting+1))*(tech.isExoticParts ? 0.7 : 1)) {
             powerUps.spawn(x, y, "field");
 	    if (tech.isTreasure && Math.random() < tech.duplicationChance()) powerUps.spawn(x, y, "tech");
             return;
         }
-        if (Math.random() < 0.03*(1+Math.log(tech.isLooting+1)) && tech.isLooting) {
+        if (Math.random() < 0.03*(1+Math.log(tech.isLooting+1))*(tech.isExoticParts ? 0.7 : 1) && tech.isLooting) {
            powerUps.spawn(x, y, "research");
 	    if (tech.isTreasure && Math.random() < tech.duplicationChance()) powerUps.spawn(x, y, "research");
+           return;
+        }
+        if (Math.random() < 0.1*(1+Math.log(tech.isLooting)) && tech.isExoticParts && tech.isLooting) {
+           powerUps.spawn(x, y, "exoticPartsMaxHP");
+           return;
+        }
+        if (Math.random() < 0.1*(1+Math.log(tech.isLooting)) && tech.isExoticParts && tech.isLooting) {
+           powerUps.spawn(x, y, "exoticPartsMaxE");
            return;
         }
     },

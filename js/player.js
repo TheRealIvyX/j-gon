@@ -512,6 +512,8 @@ const m = {
     harmReduction() {
         let dmg = 1
         dmg *= m.fieldHarmReduction
+        if (tech.isSupercapacitor && m.energy > m.maxEnergy*0.65) dmg *= 1.3
+        if (tech.isBiggerField) dmg *= 1.2
         if (tech.isZeno) dmg *= 0.15
         if (tech.isFieldHarmReduction) dmg *= 0.5
         if (tech.isHarmMACHO) dmg *= 0.33
@@ -971,7 +973,7 @@ const m = {
         }
     },
     setMaxEnergy() {
-        m.maxEnergy = (tech.isMaxEnergyTech ? 0.5 : 1) + tech.bonusEnergy + tech.healMaxEnergyBonus + tech.harmonicEnergy + 2 * tech.isGroundState + 3 * tech.isRelay * tech.isFlipFlopOn * tech.isRelayEnergy + 0.6 * (m.fieldUpgrades[m.fieldMode].name === "standing wave")
+        m.maxEnergy = (tech.isMaxEnergyTech ? 0.5 : 1) + tech.bonusEnergy + (tech.isSupercapacitor*2.2) + tech.healMaxEnergyBonus + tech.harmonicEnergy + 2 * tech.isGroundState + 3 * tech.isRelay * tech.isFlipFlopOn * tech.isRelayEnergy + 0.6 * (m.fieldUpgrades[m.fieldMode].name === "standing wave")
         simulation.makeTextLog(`<span class='color-var'>m</span>.<span class='color-f'>maxEnergy</span> <span class='color-symbol'>=</span> ${(m.maxEnergy.toFixed(2))}`)
     },
     fieldMeterColor: "#0cf",
@@ -1533,7 +1535,7 @@ const m = {
                 m.fieldBlockCD = 0;
                 m.blockingRecoil = 2 //4 is normal
                 m.fieldRange = 175
-                m.fieldShieldingScale = 1.3 * Math.pow(0.6, (tech.harmonics - 2))
+                m.fieldShieldingScale = (tech.isStandingWaveExpand ? 0.9 : 1.3) * Math.pow(0.6, (tech.harmonics - 2))
 
                 m.harmonic3Phase = () => { //normal standard 3 different 2-d circles
                     const fieldRange1 = (0.75 + 0.3 * Math.sin(m.cycle / 23)) * m.fieldRange * m.harmonicRadius
@@ -1558,7 +1560,7 @@ const m = {
                                 m.pushMass(mob[i], 0);
                             } else {
                                 m.pushMass(mob[i]);
-                                this.drainCD = m.cycle + 10
+                                this.drainCD = m.cycle + 15
                             }
                             if (mob[i].isShielded || mob[i].shield) m.fieldCDcycle = m.cycle + 20
                         }
@@ -1733,8 +1735,8 @@ const m = {
                 }
                 m.hold = function() {
                     const wave = Math.sin(m.cycle * 0.022);
-                    m.fieldRange = 180 + 12 * wave + 100 * tech.isBigField
-                    m.fieldArc = 0.35 + 0.045 * wave + 0.065 * tech.isBigField //run calculateFieldThreshold after setting fieldArc, used for powerUp grab and mobPush with lookingAt(mob)
+                    m.fieldRange = 180 + 12 * wave + 100 * tech.isBigField + (100*(25/55)) * tech.isBiggerField
+                    m.fieldArc = 0.35 + 0.045 * wave + 0.065 * tech.isBigField + (0.065*(40/22)) * tech.isBiggerField //run calculateFieldThreshold after setting fieldArc, used for powerUp grab and mobPush with lookingAt(mob)
                     m.calculateFieldThreshold();
                     if (m.isHolding) {
                         m.drawHold(m.holdingTarget);

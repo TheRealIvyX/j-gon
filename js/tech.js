@@ -2207,9 +2207,9 @@ const tech = {
             frequency: 1,
             frequencyDefault: 1,
             allowed() {
-                return !tech.isZeno && !tech.isNoHeals && !tech.isPiezo && !tech.isRewindAvoidDeath && !tech.isTechDamage && !tech.isMutualism //&& !tech.isAmmoFromHealth && !tech.isRewindGun
+                return !tech.isZeno && !tech.isNoHeals && !tech.isPiezo && !tech.isRewindAvoidDeath && !tech.isTechDamage && !tech.isMutualism && !tech.isExoticParts //&& !tech.isAmmoFromHealth && !tech.isRewindGun
             },
-            requires: "not Zeno, ergodicity, piezoelectricity, CPT, antiscience, mutualism",
+            requires: "not Zeno, ergodicity, piezoelectricity, CPT, antiscience, mutualism, exotic particles",
             effect: () => {
                 m.health = 0
                 document.getElementById("health").style.display = "none"
@@ -2411,6 +2411,25 @@ const tech = {
                     tech.removeJunkTechFromPool(this.refundAmount)
                     this.refundAmount = 0
                 }
+            }
+        },
+        {
+            name: "supercapacitor",
+            description: "increase your <strong>maximum</strong> <strong class='color-f'>energy</strong> by <strong>220</strong><br>take <strong>30%</strong> more <strong class='color-harm'>harm</strong> above 65% of your maximum <strong class='color-f'>energy</strong>",
+            maxCount: 1,
+            count: 0,
+            frequency: 1,
+            frequencyDefault: 1,
+            allowed() { return true },
+            requires: "",
+            effect() {
+                tech.isSupercapacitor = 1
+                m.setMaxEnergy()
+            },
+            refundAmount: 0,
+            remove() {
+                tech.isSupercapacitor = 0
+                m.setMaxEnergy()
             }
         },
         {
@@ -2696,7 +2715,7 @@ const tech = {
             frequency: 1,
             frequencyDefault: 1,
             allowed() {
-                return !tech.isEnergyHealth && !tech.isNoHeals
+                return !tech.isEnergyHealth && !tech.isNoHeals && !tech.isExoticParts
             },
             requires: "not mass-energy equivalence, ergodicity",
             effect() {
@@ -3169,7 +3188,7 @@ const tech = {
         },
         {
             name: "unified field theory",
-            description: `<span style = 'font-size:90%;'><strong>clicking</strong> the <strong class='color-f'>field</strong> box when <strong>paused</strong> cycles your <strong class='color-f'>field</strong><br><strong>triple</strong> the <strong class='flicker'>frequency</strong> of finding <strong class='color-f'>field</strong> <strong class='color-m'>tech</strong></span>`,
+            description: `<span style = 'font-size:90%;'><strong>clicking</strong> the <strong class='color-f'>field</strong> box when <strong>paused</strong> cycles your <strong class='color-f'>field</strong><br><strong>triple</strong> the <strong class='flicker'>frequency</strong> of finding <strong class='color-f'>field</strong><strong class='color-m'>tech</strong></span>`,
             // description: `in the <strong>pause</strong> menu, change your <strong class='color-f'>field</strong><br>by <strong>clicking</strong> on your <strong class='color-f'>field's</strong> box`,
             maxCount: 1,
             count: 0,
@@ -3689,9 +3708,9 @@ const tech = {
             frequency: 1,
             frequencyDefault: 1,
             allowed() {
-                return tech.isLooting
+                return tech.isLooting && !tech.isExoticParts
             },
-            requires: "looting",
+            requires: "looting, not exotic particles",
             effect: () => {
                 tech.isTreasure = 1
 		powerUps.setDupChance();
@@ -3701,6 +3720,24 @@ const tech = {
                 tech.isTreasure = 0
 		powerUps.setDupChance();
 		tech.removeJunkTechFromPool(0.35)
+            }
+        },
+        {
+            name: "exotic particles",
+            description: `mobs drop less power ups on death<br>mobs can drop <strong class='color-h'>exotic</strong> <strong class='color-f'>power ups</strong>`,
+            maxCount: 1,
+            count: 0,
+            frequency: 1,
+            frequencyDefault: 1,
+            allowed() {
+                return tech.isLooting && !tech.isTreasure && !tech.isEnergyHealth && !tech.isOverHeal
+            },
+            requires: "looting, not treasure, mass-energy equivalence, quenching",
+            effect: () => {
+                tech.isExoticParts = 1
+            },
+            remove() {
+                tech.isExoticParts = 0
             }
         },
         // {
@@ -3836,7 +3873,7 @@ const tech = {
         },
         {
             name: "needle gun",
-            description: "<strong>nail gun</strong> and <strong>shot gun</strong> fire mob piercing <strong>needles</strong>",
+            description: "<strong>nail gun</strong> and <strong>shotgun</strong> fire mob piercing <strong>needles</strong>",
             isGunTech: true,
             maxCount: 1,
             count: 0,
@@ -3875,7 +3912,7 @@ const tech = {
         },
         {
             name: "rivet gun",
-            description: "<strong>nail gun</strong> and <strong>shot gun</strong> slowly lob a heavy <strong>rivet</strong>",
+            description: "<strong>nail gun</strong> and <strong>shotgun</strong> slowly lob a heavy <strong>rivet</strong>",
             isGunTech: true,
             maxCount: 1,
             count: 0,
@@ -3884,7 +3921,7 @@ const tech = {
             allowed() {
                 return ((tech.haveGunCheck("nail gun") && !tech.nailInstantFireRate) || (tech.haveGunCheck("shotgun") && !tech.isNailShot && !tech.isFoamShot && !tech.isSporeWorm)) && !tech.isNeedles && !tech.isIceCrystals && !tech.isIceShot
             },
-            requires: "nail gun, shot gun, not ice crystal, needles, or pneumatic actuator",
+            requires: "nail gun, shotgun, not ice crystal, needles, or pneumatic actuator",
             effect() {
                 tech.isRivets = true
                 for (i = 0, len = b.guns.length; i < len; i++) { //find which gun 
@@ -4315,7 +4352,7 @@ const tech = {
             frequency: 1,
             frequencyDefault: 1,
             allowed() {
-                return tech.haveGunCheck("shotgun") || tech.haveGunCheck("super balls") || (tech.isRivets && !tech.isNailCrit) || (m.fieldUpgrades[m.fieldMode].name === "molecular assembler" && !(tech.isDroneTeleport || tech.isDroneRadioactive || tech.isSporeField || tech.isMissileField || tech.isIceField)) || (tech.haveGunCheck("drones") && !tech.isForeverDrones && !tech.isDroneRadioactive && !tech.isDroneTeleport)
+                return (tech.haveGunCheck("shotgun") && !tech.isNailShot && !tech.isIceShot && !tech.isRivets && !tech.isFoamShot && !tech.isSporeWorm && !tech.isNeedles) || tech.haveGunCheck("super balls") || (tech.isRivets && !tech.isNailCrit) || (m.fieldUpgrades[m.fieldMode].name === "molecular assembler" && !(tech.isDroneTeleport || tech.isDroneRadioactive || tech.isSporeField || tech.isMissileField || tech.isIceField)) || (tech.haveGunCheck("drones") && !tech.isForeverDrones && !tech.isDroneRadioactive && !tech.isDroneTeleport)
             },
             requires: "shotgun, super balls, rivets, drones, not irradiated drones or burst drones",
             effect() {
@@ -6258,7 +6295,7 @@ const tech = {
         },
         {
             name: "spherical harmonics",
-            description: "<strong>standing wave</strong> oscillates in a 3rd dimension<br>increase <strong>deflecting</strong> efficiency by <strong>40%</strong>",
+            description: "<strong>standing wave</strong> deflects <strong>40%</strong> more efficiently<br>no longer deactivates with mob <strong>shields</strong>", //<strong>standing wave</strong> oscillates in a 3rd dimension<br>
             isFieldTech: true,
             maxCount: 9,
             count: 0,
@@ -6270,18 +6307,18 @@ const tech = {
             requires: "standing wave",
             effect() {
                 tech.harmonics++
-                m.fieldShieldingScale = (tech.isStandingWaveExpand ? 1.1 : 1.3) * Math.pow(0.6, (tech.harmonics - 2))
+                m.fieldShieldingScale = (tech.isStandingWaveExpand ? 0.9 : 1.3) * Math.pow(0.6, (tech.harmonics - 2))
                 m.harmonicShield = m.harmonicAtomic
             },
             remove() {
                 tech.harmonics = 2
-                m.fieldShieldingScale = (tech.isStandingWaveExpand ? 1.1 : 1.3) * Math.pow(0.6, (tech.harmonics - 2))
+                m.fieldShieldingScale = (tech.isStandingWaveExpand ? 0.9 : 1.3) * Math.pow(0.6, (tech.harmonics - 2))
                 m.harmonicShield = m.harmonic3Phase
             }
         },
         {
             name: "expansion",
-            description: "using <strong>standing wave</strong> field <strong>expands</strong> its <strong>radius</strong><br>increase <strong>deflecting</strong> efficiency by <strong>25%</strong>",
+            description: "<strong>standing wave</strong> deflects <strong>40%</strong> more efficiently<br>using <strong>standing wave</strong> field <strong>expands</strong> its <strong>radius</strong>",
             // description: "use <strong class='color-f'>energy</strong> to <strong>expand</strong> <strong>standing wave</strong><br>the field slowly <strong>contracts</strong> when not used",
             isFieldTech: true,
             maxCount: 1,
@@ -6289,9 +6326,9 @@ const tech = {
             frequency: 2,
             frequencyDefault: 2,
             allowed() {
-                return m.fieldUpgrades[m.fieldMode].name === "standing wave"
+                return m.fieldUpgrades[m.fieldMode].name === "standing wave" && (tech.blockDmg || tech.blockingIce)
             },
-            requires: "standing wave",
+            requires: "standing wave, bremsstrahlung, triple point",
             effect() {
                 tech.isStandingWaveExpand = true
                 m.fieldShieldingScale = (tech.isStandingWaveExpand ? 1.1 : 1.3) * Math.pow(0.6, (tech.harmonics - 2))
@@ -6311,7 +6348,7 @@ const tech = {
             frequency: 2,
             frequencyDefault: 2,
             allowed() {
-                return m.fieldUpgrades[m.fieldMode].name === "standing wave" || m.fieldUpgrades[m.fieldMode].name === "perfect diamagnetism"
+                return (m.fieldUpgrades[m.fieldMode].name === "standing wave" || m.fieldUpgrades[m.fieldMode].name === "perfect diamagnetism") && !tech.isBiggerField
             },
             requires: "standing wave, perfect diamagnetism",
             effect() {
@@ -6330,7 +6367,7 @@ const tech = {
             frequency: 2,
             frequencyDefault: 2,
             allowed() {
-                return m.fieldUpgrades[m.fieldMode].name === "standing wave" || m.fieldUpgrades[m.fieldMode].name === "perfect diamagnetism"
+                return (m.fieldUpgrades[m.fieldMode].name === "standing wave" || m.fieldUpgrades[m.fieldMode].name === "perfect diamagnetism") && !tech.isBiggerField
             },
             requires: "standing wave, perfect diamagnetism",
             effect() {
@@ -6349,7 +6386,7 @@ const tech = {
             frequency: 2,
             frequencyDefault: 2,
             allowed() {
-                return m.fieldUpgrades[m.fieldMode].name === "perfect diamagnetism" || m.fieldUpgrades[m.fieldMode].name === "standing wave" || m.fieldUpgrades[m.fieldMode].name === "molecular assembler"
+                return (m.fieldUpgrades[m.fieldMode].name === "perfect diamagnetism" || m.fieldUpgrades[m.fieldMode].name === "standing wave" || m.fieldUpgrades[m.fieldMode].name === "molecular assembler") && !tech.isBiggerField
             },
             requires: "a field that can block",
             effect() {
@@ -6398,6 +6435,25 @@ const tech = {
             }
         },
         {
+            name: "pyrolytic carbon",
+            description: "increase <strong>shield radius</strong> by <strong>25%</strong> and <strong>arc</strong> by <strong>40°</strong><br>take <strong>20%</strong> more <strong class='color-harm'>harm</strong>",
+            isFieldTech: true,
+            maxCount: 1,
+            count: 0,
+            frequency: 2,
+            frequencyDefault: 2,
+            allowed() {
+                return m.fieldUpgrades[m.fieldMode].name === "perfect diamagnetism" && tech.isBigField && !tech.isStunField && !tech.blockingIce && !tech.blockDmg
+            },
+            requires: "perfect diamagnetism, meissner effect, not triple point, flux pinning, bremsstrahlung",
+            effect() {
+                tech.isBiggerField = true;
+            },
+            remove() {
+                tech.isBiggerField = false;
+            }
+        },
+        {
             name: "tessellation",
             description: `use ${powerUps.orb.research(2)}to reduce <strong class='color-harm'>harm</strong> by <strong>50%</strong>`,
             // description: "use <strong>4</strong> <strong class='color-r'>research</strong><br>reduce <strong class='color-harm'>harm</strong> by <strong>50%</strong>",
@@ -6442,7 +6498,7 @@ const tech = {
         },
         {
             name: "neutronium",
-            description: `reduce <strong class='color-harm'>harm</strong> by <strong>90%</strong> when your <strong class='color-f'>field</strong> is active<br><strong>move</strong> and <strong>jump</strong> <strong>33%</strong> <strong>slower</strong>`,
+            description: `reduce <strong class='color-harm'>harm</strong> by <strong>90%</strong> when your <strong class='color-f'>field</strong> is active<br><strong>move</strong> and <strong>jump</strong> <strong>25%</strong> <strong>slower</strong>`,
             isFieldTech: true,
             maxCount: 1,
             count: 0,
@@ -6454,8 +6510,8 @@ const tech = {
             requires: "negative mass, not mass-energy",
             effect() {
                 tech.isNeutronium = true
-                tech.baseFx *= 0.66
-                tech.baseJumpForce *= 0.66
+                tech.baseFx *= 0.75
+                tech.baseJumpForce *= 0.75
                 m.setMovement()
             },
             //also removed in m.setHoldDefaults() if player switches into a bad field
@@ -7671,25 +7727,25 @@ const tech = {
             },
             remove() {}
         },
-        {
-            name: "hi",
-            description: `spawn to seed`,
-            maxCount: 1,
-            count: 0,
-            frequency: 0,
-            isNonRefundable: true,
-            isJunk: true,
-            allowed() {
-                return true
-            },
-            requires: "",
-            effect() {
-                document.getElementById("seed").placeholder = Math.initialSeed = String(616)
-                Math.seed = Math.abs(Math.hash(Math.initialSeed)) //update randomizer seed in case the player changed it
-
-            },
-            remove() {}
-        },
+        //{
+        //    name: "hi",
+        //    description: `spawn to seed`,
+        //    maxCount: 1,
+        //    count: 0,
+        //    frequency: 0,
+        //    isNonRefundable: true,
+        //    isJunk: true,
+        //    allowed() {
+        //        return true
+        //    },
+        //    requires: "",
+        //    effect() {
+        //        document.getElementById("seed").placeholder = Math.initialSeed = String(616)
+        //        Math.seed = Math.abs(Math.hash(Math.initialSeed)) //update randomizer seed in case the player changed it
+        //
+        //    },
+        //    remove() {}
+        //},
         {
             name: "meteor shower",
             description: "take a shower, but meteors instead of water",
@@ -9383,7 +9439,7 @@ const tech = {
             allowed() { return true },
             requires: "",
             effect() {
-                const urls = ["https://scratch.mit.edu/projects/14005697/fullscreen/", "https://scratch.mit.edu/projects/22573757/fullscreen/", "https://codepen.io/lilgreenland/full/ozXNWZ", "https://codepen.io/lilgreenland/full/wzARJY", "classic/7-1-2017/", "classic/4-15-2018/", "classic/7-11-2019/", "classic/9-8-2019/", "classic/7-15-2020/", "classic/6-1-2021/"]
+                const urls = ["https://scratch.mit.edu/projects/14005697/fullscreen/", "https://scratch.mit.edu/projects/22573757/fullscreen/", "https://codepen.io/lilgreenland/full/ozXNWZ", "https://codepen.io/lilgreenland/full/wzARJY", "https://landgreen.github.io/sidescroller/classic/7-1-2017/", "https://landgreen.github.io/sidescroller/classic/4-15-2018/", "https://landgreen.github.io/sidescroller/classic/7-11-2019/", "https://landgreen.github.io/sidescroller/classic/9-8-2019/", "https://landgreen.github.io/sidescroller/classic/7-15-2020/", "https://landgreen.github.io/sidescroller/classic/6-1-2021/", "https://landgreen.github.io/sidescroller"]
                 const choose = urls[Math.floor(Math.random() * urls.length)]
                 console.log(`opening new tab" ${choose}`)
                 let tab = window.open(choose, "_blank");

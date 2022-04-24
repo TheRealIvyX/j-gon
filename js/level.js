@@ -5860,7 +5860,7 @@ const level = {
         powerUps.addResearchToLevel() //needs to run after mobs are spawned
     },
     basement() { // player made level  by    Francois 👑 from discord
-	simulation.makeTextLog(`<strong>stronghold</strong> by <span class='color-var'>Francois</span>`);
+	simulation.makeTextLog(`<strong>basement</strong> by <span class='color-var'>Francois</span>`);
         let button, door, buttonDoor, buttonPlateformEnd, doorPlateform
         let isLevelReversed = Math.random();
         if (isLevelReversed < 0.7) {
@@ -6150,7 +6150,7 @@ const level = {
         powerUps.chooseRandomPowerUp(3100, 1630);
     },
     detours() { //by Francois from discord
-	simulation.makeTextLog(`<strong>stronghold</strong> by <span class='color-var'>Francois</span>`);
+	simulation.makeTextLog(`<strong>detours</strong> by <span class='color-var'>Francois</span>. may or may not be broken`);
         level.setPosToSpawn(0, 0); //lower start
         level.exit.y = 150;
         spawn.mapRect(level.enter.x, 45, 100, 20);
@@ -9458,7 +9458,7 @@ const level = {
     // ********************************************************************************************************
     // ********************************************************************************************************
     descent() {
-        simulation.makeTextLog(`<strong>descent</strong> by <span class='color-var'>IvyX</span>. j-gon exclusive`);
+        simulation.makeTextLog(`<strong>descent</strong> by <span class='color-var'>IvyX</span>. made for j-gon`);
         level.setPosToSpawn(0, -50); //normal spawn
         level.exit.x = 10000;
         level.exit.y = 10000;

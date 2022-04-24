@@ -4,7 +4,7 @@ const spawn = {
     // other bosses: suckerBoss, laserBoss, tetherBoss, mantisBoss, bounceBoss, sprayBoss    //these need a particular level to work so they are not included in the random pool
     randomBossList: ["shieldingBoss", "orbitalBoss", "historyBoss", "shooterBoss", "cellBossCulture", "bomberBoss", "spiderBoss", "launcherBoss", "laserTargetingBoss",
         "powerUpBoss", "powerUpBossBaby", "snakeBoss", "streamBoss", "pulsarBoss", "spawnerBossCulture", "grenadierBoss", "growBossCulture", "blinkBoss",
-        "snakeSpitBoss", "laserBombingBoss", "blockBoss", "revolutionBoss", "slashBoss", "healBoss"
+        "snakeSpitBoss", "laserBombingBoss", "blockBoss", "revolutionBoss", "slashBoss", "healBoss", "constraintBoss"
     ],
     bossTypeSpawnOrder: [], //preset list of boss names calculated at the start of a run by the randomSeed
     bossTypeSpawnIndex: 0, //increases as the boss type cycles
@@ -187,7 +187,7 @@ const spawn = {
             ctx.stroke();
         }
     },
-    WIMP(x = level.exit.x + 300 * (Math.random() - 0.5), y = level.exit.y + 300 * (Math.random() - 0.5)) { //immortal mob that follows player //if you have the tech it spawns at start of every level at the exit
+    WIMP(x = level.exit.x + tech.wimpCount * 200 * (Math.random() - 0.5), y = level.exit.y + tech.wimpCount * 200 * (Math.random() - 0.5)) { //immortal mob that follows player //if you have the tech it spawns at start of every level at the exit
         mobs.spawn(x, y, 3, 0.1, "transparent");
         let me = mob[mob.length - 1];
         me.stroke = "transparent"
@@ -5727,13 +5727,52 @@ const spawn = {
             powerUps.spawnBossPowerUp(this.position.x, this.position.y)
         };
         me.do = function() {
-            this.seePlayerByLookingAt();
+            this.seePlayerByHistory()
             this.attraction();
             this.checkStatus();
             this.harmZone();
 	    for (let jej of mob) {
 	      jej.health += 0.0175 * (jej.isBoss ? 0.333 : 1)
 	      if (jej.health > 1) jej.health = 1
+	    }
+        };
+    },
+
+    constraintBoss(x, y, radius = 90) {
+        mobs.spawn(x, y, 3, radius, "#b0f");
+        let me = mob[mob.length - 1];
+	me.isBoss = true;
+        me.accelMag = 0.0002
+	me.damageReduction = 0.25 / (tech.isScaleMobsWithDuplication ? 1 + tech.duplicationChance() : 1)
+        me.memory = 240;
+        me.seeAtDistance2 = 2000000 //1400 vision range
+        me.laserRange = 370;
+        me.randombsgo = 0
+        Matter.Body.setDensity(me, 0.0017 + 0.0002 * Math.sqrt(simulation.difficulty))
+        me.onDeath = function() {
+            powerUps.spawnBossPowerUp(this.position.x, this.position.y)
+            this.removeCons(); //remove constraint
+        };
+        me.do = function() {
+            this.seePlayerCheckByDistance();
+            this.attraction();
+            this.checkStatus();
+	    if (me.randombsgo == 0) {
+	      const sub = Vector.sub(player.position, this.position)
+	      const mag = Vector.magnitude(sub)
+	      if (mag <= 666) { // attach constraint to player if too close
+	        me.randombsgo = 1
+	        consBB[consBB.length] = Constraint.create({
+	            bodyA: me,
+	            bodyB: player,
+	            stiffness: 0.001
+	        });
+	        Composite.add(engine.world, consBB[consBB.length - 1]);
+	      }
+	    }
+	    if (me.randombsgo == 1) {
+	      if (!(simulation.cycle % 60)) m.damage(0.1)
+	      Matter.Body.setAngularVelocity(this, 0.1)
 	    }
         };
     },
