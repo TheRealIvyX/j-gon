@@ -87,7 +87,7 @@ const level = {
             }
         }
         if (tech.isExtraMaxEnergy) {
-            tech.healMaxEnergyBonus += 0.05 * powerUps.totalPowerUps //Math.min(0.02 * powerUps.totalPowerUps, 0.51)
+            tech.healMaxEnergyBonus += 0.1 * powerUps.totalPowerUps //Math.min(0.02 * powerUps.totalPowerUps, 0.51)
             m.setMaxEnergy();
         }
         if (tech.isGunCycle) {
@@ -2576,6 +2576,7 @@ const level = {
         simulation.zoomTransition(level.defaultZoom)
         // document.body.style.backgroundColor = "#aaa";
         document.body.style.backgroundColor = "#ddd";
+        color.map = "#808f8f"
 
         spawn.mapRect(-3000, 800, 5000, 1200); //bottom
         spawn.mapRect(-2000, -2000, 5000, 1200); //ceiling
@@ -2687,6 +2688,7 @@ const level = {
         level.defaultZoom = 2000
         simulation.zoomTransition(level.defaultZoom)
         document.body.style.backgroundColor = "#d0d5df" //"#d8dadf";
+        color.map = "#334046";
         // powerUps.spawnStartingPowerUps(1475, -1175);
         // spawn.debris(750, -2200, 3700, 16); //16 debris per level
         const button = level.button(1400, 0)
@@ -3260,6 +3262,7 @@ const level = {
         level.defaultZoom = 2300
         simulation.zoomTransition(level.defaultZoom)
         document.body.style.backgroundColor = "#d8dadf";
+        color.map = "#3d4240"
         powerUps.spawnStartingPowerUps(-575, -2925)
         // spawn.debris(750, -2200, 3700, 16); //16 debris per level            //no debris?
 
@@ -3734,6 +3737,7 @@ const level = {
         level.defaultZoom = 2200
         simulation.zoomTransition(level.defaultZoom)
         document.body.style.backgroundColor = "#d5d5d5";
+        color.map = "#555"
         spawn.mapRect(0, -1955, 175, 30);
         const removeIndex1 = map.length - 1 //so much work to catch blocks caught at the bottom of the vertical portals
         spawn.mapRect(1225, -1955, 175, 30);
@@ -4031,6 +4035,7 @@ const level = {
         level.defaultZoom = 1800
         simulation.zoomTransition(level.defaultZoom)
         document.body.style.backgroundColor = "hsl(138, 3%, 74%)";
+        color.map = "#3d4240"
         powerUps.spawnStartingPowerUps(3475, 1775);
         spawn.debris(4575, 2550, 1600, 9); //16 debris per level
         spawn.debris(7000, 2550, 2000, 7); //16 debris per level

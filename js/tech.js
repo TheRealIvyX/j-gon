@@ -2262,7 +2262,7 @@ const tech = {
         },
         {
             name: "weak interaction",
-            description: "each unused <strong>power up</strong> at the end of a <strong>level</strong><br>adds 5 <strong>maximum</strong> <strong class='color-f'>energy</strong>", // <em>(up to 51 health per level)</em>",
+            description: "each unused <strong>power up</strong> at the end of a <strong>level</strong><br>adds 10 <strong>maximum</strong> <strong class='color-f'>energy</strong>", // <em>(up to 51 health per level)</em>",
             maxCount: 1,
             count: 0,
             frequency: 1,
@@ -2481,7 +2481,7 @@ const tech = {
         },
         {
             name: "furnace",
-            description: `passive <strong class='color-f'>energy</strong> regeneration is increased by <strong>400%</strong><br>slowly <strong>drains</strong> <strong class='color-r'>research</strong> or <strong class='color-h'>health</strong><br> spawn ${powerUps.orb.research(6)}`,
+            description: `passive <strong class='color-f'>energy</strong> regeneration is increased by <strong>550%</strong><br>slowly <strong>drains</strong> <strong class='color-r'>research</strong> or <strong class='color-h'>health</strong><br> spawn ${powerUps.orb.research(8)}`,
             maxCount: 1,
             count: 0,
             frequency: 1,
@@ -2494,10 +2494,10 @@ const tech = {
                 tech.isFurnace = true
                 m.regenEnergy = function() {
                     if (m.immuneCycle < m.cycle) m.energy += m.fieldRegen
-                    m.energy += m.fieldRegen*4
+                    m.energy += m.fieldRegen*5.5
                     if (m.energy < 0) m.energy = 0
                 }
-		for (let i = 0; i < 6; i++) powerUps.spawn(m.pos.x + Math.random() * 60, m.pos.y + Math.random() * 60, "research", false)
+		for (let i = 0; i < 8; i++) powerUps.spawn(m.pos.x + Math.random() * 60, m.pos.y + Math.random() * 60, "research", false)
             },
             remove() {
                 tech.isFurnace = false
@@ -3358,8 +3358,27 @@ const tech = {
             }
         },
         {
+            name: "options exchange",
+            link: `<a target="_blank" href='https://en.wikipedia.org/wiki/Option_(finance)' class="link">options exchange</a>`,
+            description: `clicking <strong style = 'font-size:150%;'>×</strong> for a <strong class='color-f'>field</strong>, <strong class='color-m'>tech</strong>, or <strong class='color-g'>gun</strong> has a <strong>90%</strong><br>chance to randomize <strong>choices</strong> and not <strong>cancel</strong>`,
+            maxCount: 1,
+            count: 0,
+            frequency: 1,
+            frequencyDefault: 1,
+            allowed() {
+                return !tech.isSuperDeterminism //&& (tech.isCancelRerolls || tech.isCancelDuplication)
+            },
+            requires: "not superdeterminism", //futures exchange, commodities exchange, 
+            effect() {
+                tech.isCancelTech = true
+            },
+            remove() {
+                tech.isCancelTech = false
+            }
+        },
+        {
             name: "commodities exchange",
-            description: `clicking <strong style = 'font-size:150%;'>×</strong> to cancel a <strong class='color-f'>field</strong>, <strong class='color-m'>tech</strong>, or <strong class='color-g'>gun</strong><br>spawns <strong>5-10</strong> ${powerUps.orb.heal()}, ${powerUps.orb.ammo()}, or ${powerUps.orb.research(1)}`,
+            description: `clicking <strong style = 'font-size:150%;'>×</strong> to <strong>cancel</strong> a <strong class='color-f'>field</strong>, <strong class='color-m'>tech</strong>, or <strong class='color-g'>gun</strong><br>spawns <strong>5-10</strong> ${powerUps.orb.heal()}, ${powerUps.orb.ammo()}, or ${powerUps.orb.research(1)}`,
             maxCount: 1,
             count: 0,
             frequency: 1,
@@ -5177,7 +5196,7 @@ const tech = {
         },
         {
             name: "mutualism",
-            description: "increase <strong class='color-p' style='letter-spacing: 2px;'>spore</strong> <strong class='color-d'>damage</strong> by <strong>150%</strong><br><strong class='color-p' style='letter-spacing: 2px;'>spores</strong> borrow <strong>0.5</strong> <strong>health</strong> until they <strong>die</strong>",
+            description: "increase <strong class='color-p' style='letter-spacing: 2px;'>spore</strong> <strong class='color-d'>damage</strong> by <strong>150%</strong><br>they borrow <strong>0.5</strong> <strong>health</strong> until they <strong>die</strong>",
             isGunTech: true,
             maxCount: 1,
             count: 0,
@@ -5216,7 +5235,7 @@ const tech = {
         // },
         {
             name: "nematodes",
-            description: "<strong>shotgun</strong> and <strong class='color-p' style='letter-spacing: 2px;'>sporangium</strong> hatch <strong class='color-p' style='letter-spacing: -0.8px;'>worms</strong>", //<br><strong class='color-p' style='letter-spacing: -0.8px;'>worms</strong> do <strong>250%</strong> more <strong class='color-d'>damage</strong>
+            description: "<strong>shotgun</strong> and <strong class='color-p' style='letter-spacing: 2px;'>sporangium</strong> hatch <strong class='color-p' style='letter-spacing: -0.8px;'>worms</strong><br><strong class='color-p' style='letter-spacing: 2px;'>spore</strong> <strong class='color-m'>tech</strong> applies to <strong class='color-p' style='letter-spacing: -0.8px;'>worms</strong>",
             isGunTech: true,
             maxCount: 1,
             count: 0,
@@ -5254,16 +5273,16 @@ const tech = {
         },
         {
             name: "path integration",
-            description: "<strong>drones</strong>, <strong class='color-p' style='letter-spacing: 2px;'>spores</strong>, and <strong class='color-p' style='letter-spacing: 2px;'>worms</strong><br>travel with you through <strong>levels</strong>",
+            description: "<strong>drones</strong>, <strong class='color-p' style='letter-spacing: 2px;'>spores</strong>, and <strong class='color-p' style='letter-spacing: -0.8px;'>worms</strong><br>travel with you through <strong>levels</strong>",
             isGunTech: true,
             maxCount: 1,
             count: 0,
             frequency: 2,
             frequencyDefault: 2,
             allowed() {
-                return (tech.haveGunCheck("spores") && tech.isSporeFollow) || tech.haveGunCheck("drones") || (m.fieldUpgrades[m.fieldMode].name === "molecular assembler" && !(tech.isMissileField || tech.isIceField))
+                return (tech.isSporeFollow && (tech.haveGunCheck("spores") || (tech.haveGunCheck("shotgun") && tech.isSporeWorm))) || tech.haveGunCheck("drones") || (m.fieldUpgrades[m.fieldMode].name === "molecular assembler" && !(tech.isMissileField || tech.isIceField))
             },
-            requires: "spores, diplochory, drones",
+            requires: "spores, worms, diplochory, drones",
             effect() {
                 tech.isDronesTravel = true
             },
@@ -5274,7 +5293,7 @@ const tech = {
         {
             name: "anti-shear topology",
             link: `<a target="_blank" href='https://en.wikipedia.org/wiki/Topology' class="link">anti-shear topology</a>`,
-            description: "some <strong>projectiles</strong> last <strong>30% longer</strong><br><em style = 'font-size: 83%'>drone, spore, missile, foam, wave, neutron, ice</em>",
+            description: "some <strong>projectiles</strong> last <strong>30% longer</strong><br><em style = 'font-size: 83%'>drone, spore, worm, missile, foam, wave, neutron, ice</em>",
             isGunTech: true,
             maxCount: 3,
             count: 0,
@@ -7254,7 +7273,7 @@ const tech = {
             allowed() {
                 return m.fieldUpgrades[m.fieldMode].name === "plasma torch" || m.fieldUpgrades[m.fieldMode].name === "metamaterial cloaking" || m.fieldUpgrades[m.fieldMode].name === "pilot wave" || m.fieldUpgrades[m.fieldMode].name === "molecular assembler"
             },
-            requires: "metamaterial cloaking, molecular assembler, plasma torch or pilot wave",
+            requires: "cloaking, molecular assembler, plasma torch, pilot wave",
             effect() {
                 tech.aimDamage = 1.35
                 b.setFireCD();
@@ -7313,9 +7332,9 @@ const tech = {
             frequency: 3,
             frequencyDefault: 3,
             allowed() {
-                 return (m.fieldUpgrades[m.fieldMode].name === "time dilation" || m.fieldUpgrades[m.fieldMode].name === "wormhole") && (build.isExperimentSelection || powerUps.research.count > 3)
+                 return (m.fieldUpgrades[m.fieldMode].name === "negative mass" || m.fieldUpgrades[m.fieldMode].name === "time dilation" || m.fieldUpgrades[m.fieldMode].name === "wormhole") && (build.isExperimentSelection || powerUps.research.count > 3)
             },
-            requires: "wormhole, time dilation",
+            requires: "wormhole, time dilation, negative mass",
             effect() {
                 tech.fieldDuplicate = 0.12
                 powerUps.setDupChance(); //needed after adjusting duplication chance
@@ -9430,7 +9449,7 @@ const tech = {
         },
         {
             name: "cosmogonic myth",
-            description: `open a portal to a primordial version of reality<br>after 5 minutes <strong>close</strong> the portal, and spawn 1 of every power up`,
+            description: `<span style = "opacity: 9%;">open a portal to a primordial version of reality<br>in 5 minutes close the portal, spawn 1 of each power up</span>`,
             maxCount: 1,
             count: 0,
             frequency: 0,
@@ -9439,7 +9458,7 @@ const tech = {
             allowed() { return true },
             requires: "",
             effect() {
-                const urls = ["https://scratch.mit.edu/projects/14005697/fullscreen/", "https://scratch.mit.edu/projects/22573757/fullscreen/", "https://codepen.io/lilgreenland/full/ozXNWZ", "https://codepen.io/lilgreenland/full/wzARJY", "https://landgreen.github.io/sidescroller/classic/7-1-2017/", "https://landgreen.github.io/sidescroller/classic/4-15-2018/", "https://landgreen.github.io/sidescroller/classic/7-11-2019/", "https://landgreen.github.io/sidescroller/classic/9-8-2019/", "https://landgreen.github.io/sidescroller/classic/7-15-2020/", "https://landgreen.github.io/sidescroller/classic/6-1-2021/", "https://landgreen.github.io/sidescroller"]
+                const urls = ["https://scratch.mit.edu/projects/14005697/fullscreen/", "https://scratch.mit.edu/projects/41429974/fullscreen/", "https://scratch.mit.edu/projects/43690666/fullscreen/", "https://codepen.io/lilgreenland/full/ozXNWZ", "https://codepen.io/lilgreenland/full/wzARJY", "https://landgreen.github.io/sidescroller/classic/7-1-2017/", "https://landgreen.github.io/sidescroller/classic/4-15-2018/", "https://landgreen.github.io/sidescroller/classic/7-11-2019/", "https://landgreen.github.io/sidescroller/classic/9-8-2019/", "https://landgreen.github.io/sidescroller/classic/7-15-2020/", "https://landgreen.github.io/sidescroller/classic/6-1-2021/", "https://landgreen.github.io/sidescroller"]
                 const choose = urls[Math.floor(Math.random() * urls.length)]
                 console.log(`opening new tab" ${choose}`)
                 let tab = window.open(choose, "_blank");
@@ -9764,6 +9783,7 @@ const tech = {
     isCancelDuplication: null,
     cancelCount: null,
     isCancelRerolls: null,
+    isCancelTech: null,
     isBotDamage: null,
     isBanish: null,
     isMaxEnergyTech: null,

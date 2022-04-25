@@ -301,13 +301,13 @@ ${simulation.isCheating ? "<br><br><em>lore disabled</em>": ""}
 
         //right side
         text = "";
-        if (tech.isPauseSwitchField) {
+        if (tech.isPauseSwitchField && !simulation.isChoosing) {
             text += `<div class="pause-grid-module" id ="pause-field" style="animation: fieldColorCycle 1s linear infinite alternate;"><div class="grid-title"><div class="circle-grid field"></div> &nbsp; ${build.nameLink(m.fieldUpgrades[m.fieldMode].name)}</div> ${m.fieldUpgrades[m.fieldMode].description}</div>`
         } else {
             text += `<div class="pause-grid-module" id ="pause-field"><div class="grid-title"><div class="circle-grid field"></div> &nbsp; ${build.nameLink(m.fieldUpgrades[m.fieldMode].name)}</div> ${m.fieldUpgrades[m.fieldMode].description}</div>`
         }
 
-        const style = tech.isPauseEjectTech ? 'style="animation: techColorCycle 1s linear infinite alternate;"' : ''
+        const style = (tech.isPauseEjectTech && !simulation.isChoosing) ? 'style="animation: techColorCycle 1s linear infinite alternate;"' : ''
         for (let i = 0, len = tech.tech.length; i < len; i++) {
             if (tech.tech[i].count > 0 && !tech.tech[i].isNonRefundable) {
                 const techCountText = tech.tech[i].count > 1 ? `(${tech.tech[i].count}x)` : "";
@@ -337,11 +337,24 @@ ${simulation.isCheating ? "<br><br><em>lore disabled</em>": ""}
         el = document.getElementById("pause-grid-right")
         el.style.display = "grid"
         el.innerHTML = text
+
+        document.getElementById("tech").style.display = "none"
+        document.getElementById("guns").style.display = "none"
+        document.getElementById("field").style.display = "none"
+        document.getElementById("health").style.display = "none"
+        document.getElementById("health-bg").style.display = "none"
     },
     unPauseGrid() {
+        document.getElementById("tech").style.display = "inline"
+        document.getElementById("guns").style.display = "inline"
+        document.getElementById("field").style.display = "inline"
+        document.getElementById("health").style.display = "inline"
+        document.getElementById("health-bg").style.display = "inline"
         // document.body.style.overflow = "hidden"
         document.getElementById("pause-grid-left").style.display = "none"
         document.getElementById("pause-grid-right").style.display = "none"
+        document.getElementById("pause-grid-right").style.opacity = "1"
+        document.getElementById("pause-grid-left").style.opacity = "1"
         window.scrollTo(0, 0);
     },
     isExperimentSelection: false,
