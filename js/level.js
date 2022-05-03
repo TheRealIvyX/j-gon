@@ -2687,8 +2687,8 @@ const level = {
         spawn.mapRect(level.exit.x, level.exit.y + 25, 100, 25);
         level.defaultZoom = 2000
         simulation.zoomTransition(level.defaultZoom)
-        document.body.style.backgroundColor = "#d0d5df" //"#d8dadf";
-        color.map = "#334046";
+        document.body.style.backgroundColor = "#c3d6df" //"#d8dadf";
+        color.map = "#303639";
         // powerUps.spawnStartingPowerUps(1475, -1175);
         // spawn.debris(750, -2200, 3700, 16); //16 debris per level
         const button = level.button(1400, 0)
@@ -3736,8 +3736,8 @@ const level = {
         spawn.mapRect(level.exit.x, level.exit.y + 20, 100, 20);
         level.defaultZoom = 2200
         simulation.zoomTransition(level.defaultZoom)
-        document.body.style.backgroundColor = "#d5d5d5";
-        color.map = "#555"
+        document.body.style.backgroundColor = "#d0d5d5";
+        color.map = "#444"
         spawn.mapRect(0, -1955, 175, 30);
         const removeIndex1 = map.length - 1 //so much work to catch blocks caught at the bottom of the vertical portals
         spawn.mapRect(1225, -1955, 175, 30);

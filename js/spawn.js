@@ -1207,7 +1207,7 @@ const spawn = {
         } else if (!m.isCloak) {
             me.foundPlayer();
         }
-        me.damageReduction = 0.22 / (tech.isScaleMobsWithDuplication ? 1 + tech.duplicationChance() : 1)
+        me.damageReduction = 0.2 / (tech.isScaleMobsWithDuplication ? 1 + tech.duplicationChance() : 1)
         me.isInvulnerable = true
         me.startingDamageReduction = me.damageReduction
         me.damageReduction = 0

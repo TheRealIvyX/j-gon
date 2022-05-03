@@ -553,7 +553,7 @@ const tech = {
         {
             name: "cache",
             link: `<a target="_blank" href='https://en.wikipedia.org/wiki/Cache_(computing)' class="link">cache</a>`,
-            description: `${powerUps.orb.ammo()} give <strong>14x</strong> more <strong class='color-ammo'>ammo</strong>, but<br>you can't <strong>store</strong> any more <strong class='color-ammo'>ammo</strong> than that`,
+            description: `${powerUps.orb.ammo()} give <strong>16x</strong> more <strong class='color-ammo'>ammo</strong>, but<br>you can't <strong>store</strong> any more <strong class='color-ammo'>ammo</strong> than that`,
             // ammo powerups always max out your gun,
             // but the maximum ammo ti limited
             // description: `${powerUps.orb.ammo()} give <strong>13x</strong> more <strong class='color-ammo'>ammo</strong>, but<br>you can't <strong>store</strong> any more <strong class='color-ammo'>ammo</strong> than that`,
@@ -566,7 +566,7 @@ const tech = {
             },
             requires: "not exciton",
             effect() {
-                tech.ammoCap = 14;
+                tech.ammoCap = 16;
                 powerUps.ammo.effect()
             },
             remove() {
@@ -589,6 +589,25 @@ const tech = {
             },
             remove() {
                 tech.isAmmoFromHealth = false;
+            }
+        },
+        {
+            name: "eternalism",
+            description: `choosing a <strong class='color-f'>field</strong>, <strong class='color-m'>tech</strong>, or <strong class='color-g'>gun</strong> spawns ${powerUps.orb.ammo()}<br><strong>time</strong> doesn't <strong>pause</strong> while choosing`, //${powerUps.orb.heal()} or
+            // description: "increase <strong class='color-d'>damage</strong> by <strong>50%</strong>, but <strong>time</strong> continues<br>while choosing a <strong class='color-f'>field</strong>, <strong class='color-m'>tech</strong>, or <strong class='color-g'>gun</strong>",
+            maxCount: 1,
+            count: 0,
+            frequency: 1,
+            frequencyDefault: 1,
+            allowed() {
+                return true
+            },
+            requires: "",
+            effect() {
+                tech.isNoDraftPause = true
+            },
+            remove() {
+                tech.isNoDraftPause = false
             }
         },
         {
@@ -2235,7 +2254,7 @@ const tech = {
         {
             name: "1st ionization energy",
             link: `<a target="_blank" href='https://en.wikipedia.org/wiki/Ionization_energy' class="link">1st ionization energy</a>`,
-            description: `each ${powerUps.orb.heal()} you collect<br>increases your <strong>maximum</strong> <strong class='color-f'>energy</strong> by <strong>8</strong>`,
+            description: `each ${powerUps.orb.heal()} you collect<br>increases your <strong>maximum</strong> <strong class='color-f'>energy</strong> by <strong>12</strong>`,
             maxCount: 1,
             count: 0,
             frequency: 2,
@@ -3524,8 +3543,8 @@ const tech = {
             description: `when you reach <strong>111%</strong> <strong class='color-dup'>duplication</strong><br>spawn <strong>11 bosses</strong> with <strong>111%</strong> more <strong>health</strong>`,
             maxCount: 1,
             count: 0,
-            frequency: 10,
-            frequencyDefault: 10,
+            frequency: 6,
+            frequencyDefault: 6,
             isNonRefundable: true,
             allowed() {
                 return tech.duplicationChance() > 0.6
@@ -4173,7 +4192,8 @@ const tech = {
             frequency: 2,
             frequencyDefault: 2,
             allowed() {
-                return tech.isMineDrop + tech.nailBotCount + tech.fragments + tech.nailsDeathMob / 2 + ((tech.haveGunCheck("mine") && !tech.isLaserMine) + (tech.haveGunCheck("nail gun") && !tech.isShieldPierce) + tech.isNeedles + tech.isNailShot) * 2 > 1
+                // return tech.isMineDrop + tech.nailBotCount + tech.fragments + tech.nailsDeathMob / 2 + ((tech.haveGunCheck("mine") && !tech.isLaserMine) + (tech.haveGunCheck("nail gun") && !tech.isShieldPierce) + tech.isNeedles + tech.isNailShot) * 2 > 1
+                return tech.isMineDrop || tech.nailBotCount || tech.fragments || tech.nailsDeathMob || (tech.haveGunCheck("mine") && !tech.isLaserMine) || (tech.haveGunCheck("nail gun") && !tech.isShieldPierce) || (tech.haveGunCheck("shotgun") && (tech.isNeedles || tech.isNailShot))
             },
             requires: "nail gun, nails, rivets, mine, not ceramic needles",
             effect() {
@@ -7728,6 +7748,32 @@ const tech = {
         //     remove() {}
         // },
         {
+            name: "panpsychism",
+            description: "awaken all <strong class='color-block'>blocks</strong><br><strong class='color-block'>blocks</strong> have a chance to spawn random power ups",
+            maxCount: 1,
+            count: 0,
+            frequency: 0,
+            isJunk: true,
+            isNonRefundable: true,
+            allowed() {
+                return true
+            },
+            requires: "",
+            effect() {
+                setInterval(() => {
+                    for (let i = body.length - 1; i > -1; i--) {
+                        if (!body[i].isNotHoldable) {
+                            Matter.Composite.remove(engine.world, body[i]);
+                            spawn.blockMob(body[i].position.x, body[i].position.y, body[i], 0);
+                            if (!body[i].isAboutToBeRemoved) mob[mob.length - 1].isDropPowerUp = true
+                            body.splice(i, 1);
+                        }
+                    }
+                }, 6000);
+            },
+            remove() {}
+        },
+        {
             name: "discount",
             description: "get 3 random <strong class='color-j'>JUNK</strong> <strong class='color-m'>tech</strong> for the price of 1!",
             maxCount: 1,
@@ -7783,12 +7829,13 @@ const tech = {
                     fireBlock = function(xPos, yPos) {
                         const index = body.length
                         spawn.bodyRect(xPos, yPos, 20 + 50 * Math.random(), 20 + 50 * Math.random());
-                        const bodyBullet = body[body.length - 1]
-                        Matter.Body.setVelocity(body[index], { x: 5 * (Math.random() - 0.5), y: 10 * (Math.random() - 0.5) });
-                        body[index].collisionFilter.category = cat.body;
-                        body[index].collisionFilter.mask = cat.player | cat.map | cat.body | cat.bullet | cat.mob | cat.mobBullet
-                        body[index].classType = "body";
-                        Composite.add(engine.world, body[index]); //add to world
+                        const bodyBullet = body[index]
+                        Matter.Body.setVelocity(bodyBullet, { x: 5 * (Math.random() - 0.5), y: 10 * (Math.random() - 0.5) });
+                        bodyBullet.isAboutToBeRemoved = true
+                        bodyBullet.collisionFilter.category = cat.body;
+                        bodyBullet.collisionFilter.mask = cat.player | cat.map | cat.body | cat.bullet | cat.mob | cat.mobBullet
+                        bodyBullet.classType = "body";
+                        Composite.add(engine.world, bodyBullet); //add to world
                         setTimeout(() => { //remove block
                             for (let i = 0; i < body.length; i++) {
                                 if (body[i] === bodyBullet) {
@@ -7796,7 +7843,7 @@ const tech = {
                                     body.splice(i, 1);
                                 }
                             }
-                        }, 3000 + Math.floor(6000 * Math.random()));
+                        }, 4000 + Math.floor(9000 * Math.random()));
                     }
                     fireBlock(player.position.x + 600 * (Math.random() - 0.5), player.position.y - 500 - 500 * Math.random());
                     // for (let i = 0, len =  Math.random(); i < len; i++) {
@@ -7870,6 +7917,25 @@ const tech = {
                 }
             },
             remove() {}
+        },
+        {
+            name: "opacity",
+            description: "",
+            maxCount: 1,
+            count: 0,
+            frequency: 0,
+            frequencyDefault: 0,
+            isJunk: true,
+            allowed() {
+                return true
+            },
+            requires: "",
+            effect() {
+
+            },
+            remove() {
+
+            }
         },
         {
             name: "brainstorm",
@@ -9927,5 +9993,5 @@ const tech = {
     isRelayEnergy: null,
     coyoteTime: null,
     missileFireCD: null,
-    isBotField: null
+    isBotField: null,
 }
