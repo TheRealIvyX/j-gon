@@ -509,30 +509,34 @@ const m = {
 
     defaultFPSCycle: 0, //tracks when to return to normal fps
     immuneCycle: 0, //used in engine
-    harmReduction() {
+    harmReduction(ignoreArmorConfig = false) {
         let dmg = 1
-        dmg *= m.fieldHarmReduction
-        if (tech.isSupercapacitor && m.energy > m.maxEnergy*0.65) dmg *= 1.3
-        if (tech.isBiggerField) dmg *= 1.2
-        if (tech.isZeno) dmg *= 0.15
-        if (tech.isFieldHarmReduction) dmg *= 0.5
-        if (tech.isHarmMACHO) dmg *= 0.33
-        if (tech.isImmortal) dmg *= 0.66
-        if (tech.isHarmReduceNoKill && m.lastKillCycle + 300 < m.cycle) dmg *= 0.33
-        if (tech.healthDrain) dmg *= 1 + 3.33 * tech.healthDrain //tech.healthDrain = 0.03 at one stack //cause more damage
-        if (tech.squirrelFx !== 1) dmg *= 1 + (tech.squirrelFx - 1) / 5 //cause more damage
-        if (tech.isAddBlockMass && m.isHolding) dmg *= 0.15
-        if (tech.isSpeedHarm) dmg *= 1 - Math.min(player.speed * 0.0165, 0.66)
-        if (tech.isSlowFPS) dmg *= 0.8
-        if (tech.isHarmReduce && input.field && m.fieldCDcycle < m.cycle) dmg *= 0.34
-        if (tech.isNeutronium && input.field && m.fieldCDcycle < m.cycle) dmg *= 0.1
-        if (tech.isBotArmor) dmg *= 0.94 ** b.totalBots()
-        if (tech.isHarmArmor && m.lastHarmCycle + 600 > m.cycle) dmg *= 0.33;
-        if (tech.isNoFireDefense && m.cycle > m.fireCDcycle + 120) dmg *= 0.3
-        if (tech.energyRegen === 0) dmg *= 0.34
-        if (tech.isTurret && m.crouch) dmg *= 0.34;
-        if (tech.isEntanglement && b.inventory[0] === b.activeGun) {
-            for (let i = 0, len = b.inventory.length; i < len; i++) dmg *= 0.87 // 1 - 0.15
+        if ((ignoreArmorConfig == true && tech.isArmoredConfig) || !tech.isArmoredConfig) {
+            dmg *= m.fieldHarmReduction
+            if (tech.isSupercapacitor && m.energy > m.maxEnergy*0.65) dmg *= 1.3
+            if (tech.isBiggerField) dmg *= 1.2
+            if (tech.isZeno) dmg *= 0.15
+            if (tech.isFieldHarmReduction) dmg *= 0.5
+            if (tech.isHarmMACHO) dmg *= 0.33
+            if (tech.isImmortal) dmg *= 0.66
+            if (tech.isHarmReduceNoKill && m.lastKillCycle + 300 < m.cycle) dmg *= 0.33
+            if (tech.healthDrain) dmg *= 1 + 3.33 * tech.healthDrain //tech.healthDrain = 0.03 at one stack //cause more damage
+            if (tech.squirrelFx !== 1) dmg *= 1 + (tech.squirrelFx - 1) / 5 //cause more damage
+            if (tech.isAddBlockMass && m.isHolding) dmg *= 0.15
+            if (tech.isSpeedHarm) dmg *= 1 - Math.min(player.speed * 0.0165, 0.66)
+            if (tech.isSlowFPS) dmg *= 0.8
+            if (tech.isHarmReduce && input.field && m.fieldCDcycle < m.cycle) dmg *= 0.34
+            if (tech.isNeutronium && input.field && m.fieldCDcycle < m.cycle) dmg *= 0.1
+            if (tech.isBotArmor) dmg *= 0.94 ** b.totalBots()
+            if (tech.isHarmArmor && m.lastHarmCycle + 600 > m.cycle) dmg *= 0.33;
+            if (tech.isNoFireDefense && m.cycle > m.fireCDcycle + 120) dmg *= 0.3
+            if (tech.energyRegen === 0) dmg *= 0.34
+            if (tech.isTurret && m.crouch) dmg *= 0.34;
+            if (tech.isEntanglement && b.inventory[0] === b.activeGun) {
+                for (let i = 0, len = b.inventory.length; i < len; i++) dmg *= 0.87 // 1 - 0.15
+            }
+        } else {
+            dmg = tech.armoredConfigDamageReduct
         }
         return dmg
     },
@@ -691,6 +695,7 @@ const m = {
         } else {
             dmg *= m.harmReduction()
             m.health -= dmg;
+            if (tech.isArmoredConfig) {tech.armoredConfigDamageReduct = Math.min(tech.armoredConfigDamageReduct+0.12, 1.5)}
             if (m.health < 0 || isNaN(m.health)) {
                 if (tech.isDeathAvoid && powerUps.research.count > 0 && !tech.isDeathAvoidedThisLevel) { //&& Math.random() < 0.5
                     tech.isDeathAvoidedThisLevel = true

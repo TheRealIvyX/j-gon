@@ -153,6 +153,7 @@ const level = {
         }
         simulation.dmgScale = Math.max(0.1, 0.34 * simulation.difficulty) //damage done by mobs scales with total levels
         simulation.healScale = 1 / (1 + simulation.difficulty * 0.052) //a higher denominator makes for lower heals // m.health += heal * simulation.healScale;
+        if (tech.isArmoredConfig) simulation.dmgScale = Math.min(simulation.dmgScale, 0.34*simulation.difficulty*num*9);
         // console.log(`CD = ${simulation.CDScale}`)
     },
     difficultyDecrease(num = 1) { //used in easy mode for simulation.reset()
@@ -165,6 +166,7 @@ const level = {
         if (simulation.difficulty < 1) simulation.difficulty = 0;
         simulation.dmgScale = Math.max(0.1, 0.34 * simulation.difficulty) //damage done by mobs scales with total levels
         simulation.healScale = 1 / (1 + simulation.difficulty * 0.052)
+        if (tech.isArmoredConfig) simulation.dmgScale = Math.min(simulation.dmgScale, 0.34*simulation.difficulty*num*9);
     },
     difficultyText() {
 	switch (simulation.difficultyMode) {
@@ -174,7 +176,7 @@ const level = {
 		case 6: return "why";break;
 		case 12: return "dont";break;
 		default:
-			let text = 'imagine being this bad'
+			let text = 'game journalist'
 			if (simulation.difficultyMode == 0) text = 'deserted'
 			if (simulation.difficultyMode > 1) text = 'bad'
 			if (simulation.difficultyMode > 2) text = 'mid'

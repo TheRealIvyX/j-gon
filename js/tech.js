@@ -247,6 +247,7 @@ const tech = {
         if (tech.isSpeedDamage) dmg *= 1 + Math.min(0.66, player.speed * 0.0165)
         if (tech.isBotDamage) dmg *= 1 + 0.06 * b.totalBots()
         if (tech.isDamageAfterKillNoRegen && m.lastKillCycle + 300 > m.cycle) dmg *= 1.5
+        if (tech.isArmoredConfig) dmg /= m.harmReduction(true)
         return dmg * tech.slowFire * tech.aimDamage
     },
     duplicationChance() {
@@ -2226,9 +2227,9 @@ const tech = {
             frequency: 1,
             frequencyDefault: 1,
             allowed() {
-                return !tech.isZeno && !tech.isNoHeals && !tech.isPiezo && !tech.isRewindAvoidDeath && !tech.isTechDamage && !tech.isMutualism && !tech.isExoticParts //&& !tech.isAmmoFromHealth && !tech.isRewindGun
+                return !tech.isZeno && !tech.isNoHeals && !tech.isPiezo && !tech.isRewindAvoidDeath && !tech.isTechDamage && !tech.isMutualism && !tech.isExoticParts && !tech.isArmoredConfig //&& !tech.isAmmoFromHealth && !tech.isRewindGun
             },
-            requires: "not Zeno, ergodicity, piezoelectricity, CPT, antiscience, mutualism, exotic particles",
+            requires: "not Zeno, ergodicity, piezoelectricity, CPT, antiscience, mutualism, exotic particles, armored config",
             effect: () => {
                 m.health = 0
                 document.getElementById("health").style.display = "none"
@@ -3776,6 +3777,24 @@ const tech = {
             },
             remove() {
                 tech.isExoticParts = 0
+            }
+        },
+        {
+            name: "armored configuration",
+            description: "gain <strong class='color-harm'>harm</strong> reduction over time capped at <strong>97%</strong><br>lose <strong>12%</strong> <strong class='color-harm'>harm</strong> reduction on hit<br>all other <strong class='color-harm'>harm</strong> reduction transferred to <strong class='color-d'>damage</strong> increase",
+            maxCount: 1,
+            count: 0,
+            frequency: 1,
+            frequencyDefault: 1,
+            allowed() {
+                return !tech.isEnergyHealth
+            },
+            requires: "not mass-energy",
+            effect() {
+                tech.isArmoredConfig = true
+            },
+            remove() {
+                tech.isArmoredConfig = false
             }
         },
         // {
@@ -9994,4 +10013,6 @@ const tech = {
     coyoteTime: null,
     missileFireCD: null,
     isBotField: null,
+    isArmoredConfig: null,
+    armoredConfigDamageReduct: 0.03,
 }

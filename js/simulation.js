@@ -1040,6 +1040,9 @@ const simulation = {
 		}
 	      }
 	    }
+        if (tech.isArmoredConfig) {
+          tech.armoredConfigDamageReduct = Math.max(tech.armoredConfigDamageReduct-0.025,0.03)
+        }
             if (!(m.cycle % 420)) { //once every 7 seconds
                 if (tech.isZeno) {
                     m.health *= 0.93 //remove 7%
